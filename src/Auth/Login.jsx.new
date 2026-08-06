@@ -1,0 +1,89 @@
+import { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
+import { AuthContext } from "../context/AuthContext";
+
+function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const navigate = useNavigate();
+  const { setUser } = useContext(AuthContext);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const response = await api.post("/login", {
+        email,
+        password,
+      });
+
+      const payload = response.data;
+      const token = payload?.token || payload?.access_token || payload?.data?.token || payload?.data?.access_token;
+
+      if (token) {
+        localStorage.setItem("token", token);
+        api.defaults.headers.common.Authorization = `Bearer ${token}`;
+      }
+
+      const userResponse = await api.get("/user");
+      const user = userResponse.data?.user || userResponse.data?.data || userResponse.data;
+
+      if (user) {
+        setUser(user);
+      }
+
+      const role = user?.roles?.[0]?.name || user?.role;
+
+      if (role === "admin") {
+        navigate("/admin/dashboard");
+      } else if (role === "cashier") {
+        navigate("/cashier/dashboard");
+      } else if (role === "manager") {
+        navigate("/manager/dashboard");
+      } else if (role === "chef") {
+        navigate("/chef/dashboard");
+      } else {
+        navigate("/");
+      }
+    } catch (error) {
+      console.log(error);
+      setError(error.response?.data?.message || error.message || "Login failed");
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-xl shadow-md w-96">
+        <h1 className="text-2xl font-bold text-center mb-6">POS Login</h1>
+
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+
+        <form onSubmit={handleLogin}>
+          <input
+            className="w-full border p-2 mb-4 rounded"
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <input
+            className="w-full border p-2 mb-4 rounded"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <button className="w-full bg-blue-600 text-white p-2 rounded">Login</button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default Login;
