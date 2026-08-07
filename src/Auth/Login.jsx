@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api, { AUTH_ENDPOINTS } from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
 import {
   Lock,
@@ -15,7 +14,7 @@ import {
 
 export default function Login() {
   const navigate = useNavigate();
-  const { fetchUser } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,14 +29,8 @@ export default function Login() {
     setError("");
 
     try {
-      // 1. Initialize Sanctum CSRF cookie
-      await api.get(AUTH_ENDPOINTS.csrf);
-
-      // 2. Perform authentication request
-      await api.post(AUTH_ENDPOINTS.login, { email, password });
-
-      // 3. Fetch authenticated user details
-      const user = await fetchUser();
+      const response = await login({ email, password });
+      const user = response.user;
 
       if (!user) {
         setError("Unable to retrieve authenticated user details.");

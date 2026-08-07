@@ -22,15 +22,11 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Login handler with CSRF cookie initialization
+  // Cross-site API authentication uses a Sanctum bearer token.
   const login = async (credentials) => {
-    // 1. Get Sanctum CSRF cookie FIRST
-    await api.get(AUTH_ENDPOINTS.csrf);
-
-    // 2. Perform login request
     const res = await api.post(AUTH_ENDPOINTS.login, credentials);
 
-    // 3. Fetch logged-in user profile
+    localStorage.setItem("pos_access_token", res.data.token);
     const loggedInUser = res.data.user ?? (await fetchUser());
     setUser(loggedInUser);
 
@@ -44,6 +40,7 @@ export function AuthProvider({ children }) {
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
+      localStorage.removeItem("pos_access_token");
       setUser(null);
     }
   };
