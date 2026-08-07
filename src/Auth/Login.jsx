@@ -30,16 +30,13 @@ export default function Login() {
     setError("");
 
     try {
-      // 1. Get Sanctum CSRF cookie
+      // 1. Initialize Sanctum CSRF cookie
       await api.get(AUTH_ENDPOINTS.csrf);
 
-      // 2. Authenticate
-      await api.post(AUTH_ENDPOINTS.login, {
-        email,
-        password,
-      });
+      // 2. Perform authentication request
+      await api.post(AUTH_ENDPOINTS.login, { email, password });
 
-      // 3. Get user state
+      // 3. Fetch authenticated user details
       const user = await fetchUser();
 
       if (!user) {
@@ -47,7 +44,7 @@ export default function Login() {
         return;
       }
 
-      // 4. Role-based Navigation
+      // 4. Role-based Routing
       const role = user.roles?.[0]?.name?.toLowerCase();
 
       switch (role) {
@@ -87,13 +84,11 @@ export default function Login() {
 
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F8FAFC]">
-      {/* Left Column: Visual Branding Panel (Hidden on small screens) */}
+      {/* Visual Branding Panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-[#002B7F] text-white p-12 flex-col justify-between relative overflow-hidden">
-        {/* Background Decorative Rings */}
         <div className="absolute -top-16 -left-16 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
         <div className="absolute -bottom-20 -right-20 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl" />
 
-        {/* Brand Header */}
         <div className="relative z-10 flex items-center gap-3">
           <div className="p-2.5 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
             <Store className="w-6 h-6 text-white" />
@@ -101,7 +96,6 @@ export default function Login() {
           <span className="text-xl font-bold tracking-tight">ApexPOS</span>
         </div>
 
-        {/* Content / Hero Copy */}
         <div className="relative z-10 space-y-6 max-w-lg">
           <h1 className="text-4xl font-extrabold leading-tight">
             Streamlined Management for Your Business Ops.
@@ -122,17 +116,14 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Footer info */}
         <div className="relative z-10 text-xs text-slate-400">
           © {new Date().getFullYear()} Point of Sale Enterprise System. All rights reserved.
         </div>
       </div>
 
-      {/* Right Column: Authentication Form */}
+      {/* Form Container */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md space-y-8">
-          
-          {/* Form Header */}
           <div className="space-y-2 text-center sm:text-left">
             <div className="lg:hidden inline-flex p-3 bg-blue-50 rounded-xl text-[#002B7F] mb-4">
               <Store className="w-6 h-6" />
@@ -145,17 +136,14 @@ export default function Login() {
             </p>
           </div>
 
-          {/* Error Message Box */}
           {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 animate-in fade-in duration-200">
+            <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
               <p className="text-sm text-red-600 font-medium">{error}</p>
             </div>
           )}
 
-          {/* Credentials Form */}
           <form onSubmit={handleLogin} className="space-y-5">
-            {/* Email Field */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                 Email Address
@@ -167,19 +155,16 @@ export default function Login() {
                   placeholder="name@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#002B7F] focus:border-transparent transition-all placeholder:text-slate-400 text-slate-800"
+                  className="w-full pl-11 pr-4 py-3 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#002B7F] text-slate-800"
                   required
                 />
               </div>
             </div>
 
-            {/* Password Field */}
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  Password
-                </label>
-              </div>
+              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                Password
+              </label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
@@ -187,24 +172,23 @@ export default function Login() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-11 py-3 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#002B7F] focus:border-transparent transition-all placeholder:text-slate-400 text-slate-800"
+                  className="w-full pl-11 pr-11 py-3 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#002B7F] text-slate-800"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
 
-            {/* Submit Action Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-[#002B7F] hover:bg-blue-900 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+              className="w-full flex items-center justify-center gap-2 bg-[#002B7F] hover:bg-blue-900 text-white font-semibold py-3 px-4 rounded-xl transition-all disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -216,7 +200,6 @@ export default function Login() {
               )}
             </button>
           </form>
-          
         </div>
       </div>
     </div>
