@@ -13,7 +13,7 @@ const api = axios.create({
 
 export const AUTH_ENDPOINTS = {
     csrf: "/sanctum/csrf-cookie",
-    login: "/login",
+    login: "/api/login",
     logout: "/api/logout",
     user: "/api/user",
 };
