@@ -12,8 +12,7 @@ const api = axios.create({
 });
 
 export const AUTH_ENDPOINTS = {
-    // Sanctum registers this route outside Laravel's /api prefix.
-    csrf: "/sanctum/csrf-cookie",
+    csrf: "/api/sanctum/csrf-cookie",
     login: "/api/login",
     logout: "/api/logout",
     user: "/api/user",
