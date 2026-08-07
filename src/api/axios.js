@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "https://pointofsale-sk8k.onrender.com",
+    baseURL: "https://pointofsale-1.onrender.com",
     withCredentials: true,
     withXSRFToken: true,
     headers: {
