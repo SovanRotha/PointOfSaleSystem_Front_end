@@ -12,10 +12,10 @@ const api = axios.create({
 });
 
 export const AUTH_ENDPOINTS = {
-    csrf: "/sanctum/csrf-cookie",
-    login: "/login",        // Matches route in web group in api.php
-    logout: "/logout",      // Matches /logout route
-    user: "/user",          // Matches /user route
+    csrf: "/api/sanctum/csrf-cookie",
+    login: "/api/login",
+    logout: "/api/logout",
+    user: "/api/user",
 };
 
 export default api;
