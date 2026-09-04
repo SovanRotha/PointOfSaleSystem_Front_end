@@ -1,8 +1,10 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "https://pointofsale-1.onrender.com",
-    withCredentials: false,
+    baseURL: "http://localhost:8000",
+    withCredentials: true,
+    xsrfCookieName: "XSRF-TOKEN",
+    xsrfHeaderName: "X-XSRF-TOKEN",
     headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -21,10 +23,19 @@ api.interceptors.request.use((config) => {
 });
 
 export const AUTH_ENDPOINTS = {
-    csrf: "/sanctum/csrf-cookie",
+    csrf: "/api/sanctum/csrf-cookie",
     login: "/api/login",
     logout: "/api/logout",
     user: "/api/user",
+};
+
+export const getXsrfToken = () => {
+    const token = document.cookie
+        .split(";")
+        .find((cookie) => cookie.trim().startsWith("XSRF-TOKEN="))
+        ?.split("=")[1];
+
+    return token ? decodeURIComponent(token) : "";
 };
 
 export default api;

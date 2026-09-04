@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api/axios";
+import api, { AUTH_ENDPOINTS, getXsrfToken } from "../api/axios";
 import {
   ArrowLeft,
   User,
@@ -40,11 +40,9 @@ export default function AddUser() {
   const getRoles = async () => {
     try {
       const response = await api.get("/api/roles");
-      setRoles(
-        Array.isArray(response.data)
-          ? response.data
-          : response.data?.data ?? []
-      );
+      const payload =
+        response.data?.roles ?? response.data?.data ?? response.data ?? [];
+      setRoles(Array.isArray(payload) ? payload : []);
     } catch (error) {
       console.error("Failed to fetch roles:", error);
       setErrors((prev) => ({
@@ -90,9 +88,16 @@ export default function AddUser() {
     }
 
     try {
+      await api.get(AUTH_ENDPOINTS.csrf);
+      const xsrfToken = getXsrfToken();
+
+      if (!xsrfToken) {
+        throw new Error("CSRF cookie was not set by the server.");
+      }
+
       const response = await api.post("/api/register", data, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          "X-XSRF-TOKEN": xsrfToken,
         },
       });
 
@@ -106,6 +111,12 @@ export default function AddUser() {
         setErrors(error.response.data.errors || {});
       } else {
         console.error("Registration error:", error);
+        setErrors({
+          submit: [
+            error.response?.data?.message ||
+              "Unable to create the user. Please try again.",
+          ],
+        });
       }
     } finally {
       setSubmitting(false);
@@ -147,6 +158,13 @@ export default function AddUser() {
           <div className="flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm font-medium">
             <AlertCircle className="w-5 h-5 shrink-0" />
             <span>{errors.roles[0]}</span>
+          </div>
+        )}
+
+        {errors.submit && (
+          <div className="flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm font-medium">
+            <AlertCircle className="w-5 h-5 shrink-0" />
+            <span>{errors.submit[0]}</span>
           </div>
         )}
 
